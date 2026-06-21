@@ -26,3 +26,12 @@ Este archivo contiene las directrices de desarrollo y despliegue del proyecto pa
 - **Secretos en Código**: No codificar nunca en duro (*hardcode*) tokens de API (ej. `ghp_`, `gho_`, `AIzaSy`), contraseñas o claves secretas en notebooks ni archivos del proyecto.
 - **Validación con Git Hooks**: El repositorio cuenta con un hook de `pre-commit` en `.githooks/pre-commit` que intercepta automáticamente cualquier intento de commit si detecta archivos sensibles o patrones de secretos en el código modificado. Asegúrate de tenerlo habilitado localmente con el comando: `git config core.hooksPath .githooks`.
 
+## 6. Reglas de Ejecución de CLI (Azure CLI & Databricks CLI)
+- **Verificación de Autenticación**: Antes de ejecutar comandos de despliegue, comprobar la sesión con `az account show` y `databricks auth describe` / `databricks profiles list`.
+- **Idempotencia**: Validar configuraciones con `databricks bundle validate` antes de desplegar. Comprobar si un recurso ya existe antes de crearlo con comandos de consulta (ej. `az group exists`).
+- **Modo No Interactivo**: Utilizar siempre flags no interactivos (como `--yes`, `-y`) para evitar bloqueos en la terminal.
+- **Formato estructurado (JSON)**: Solicitar salidas en formato JSON (`-o json` para Azure CLI y `--output json` para Databricks CLI) para permitir un parseo fiable de recursos.
+- **Límites de Costos y Región**: Inyectar explícitamente los parámetros `--location swedencentral` y los perfiles de cluster Single Node (`num_workers: 0`) en los comandos correspondientes.
+- **Guardrails Destructivos**: Solicitar confirmación interactiva expresa del usuario antes de proponer cualquier comando de eliminación de recursos (ej. `az group delete`, etc.).
+
+
