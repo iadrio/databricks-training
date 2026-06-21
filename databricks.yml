@@ -1,0 +1,29 @@
+bundle:
+  name: hello-databricks-bundle
+
+workspace:
+  host: https://adb-7405619016782066.6.azuredatabricks.net
+  profile: TRAINING
+
+resources:
+  jobs:
+    hello_job:
+      name: "hello-databricks-job"
+      tasks:
+        - task_key: "run_notebook"
+          new_cluster:
+            spark_version: "15.4.x-scala2.12"
+            node_type_id: "Standard_D4ds_v4"
+            num_workers: 0
+            spark_conf:
+              "spark.master": "local[*]"
+              "spark.databricks.cluster.profile": "singleNode"
+            custom_tags:
+              "ResourceClass": "SingleNode"
+          notebook_task:
+            notebook_path: ./src/hello_databricks.py
+
+targets:
+  dev:
+    default: true
+    mode: development
