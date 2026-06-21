@@ -9,6 +9,8 @@ Este archivo contiene las directrices de desarrollo y despliegue del proyecto pa
 - Usar siempre el nivel **Standard** para el workspace.
 - Usar exclusivamente clusters de **Single Node** (Nodo único).
 - En el archivo `databricks.yml`, configurar el cluster siempre con `num_workers: 0` y `"spark.master": "local[*]"` para evitar costos de nodos de trabajo adicionales.
+- **Caducidad del Entorno (14-15 días)**: Dado que las cuentas de evaluación de Databricks expiran en 14 o 15 días, toda la configuración de infraestructura (scripts de Azure CLI, plantillas y archivos del bundle como `databricks.yml`) debe mantenerse completamente versionada, modular y documentada para permitir la destrucción y recreación completa del entorno desde cero en pocos minutos en caso de expirar.
+
 
 ## 2. Restricción Geográfica (Región)
 - Desplegar únicamente recursos en la región **`swedencentral`** debido a limitaciones de la suscripción de Azure para Estudiantes (otras regiones producirán `RequestDisallowedByAzure`).
