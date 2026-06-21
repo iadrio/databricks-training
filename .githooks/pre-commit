@@ -1,0 +1,36 @@
+#!/bin/sh
+
+# Hook de pre-commit para evitar subir secretos o archivos sensibles a Git.
+
+# 1. Comprobar si se intentan subir archivos bloqueados
+blocked_patterns="\.env|\.env\..*|credentials|secrets\.json|.*\.pem|.*\.key"
+staged_files=$(git diff --cached --name-only)
+
+for file in $staged_files; do
+  if echo "$file" | grep -E -q "$blocked_patterns"; then
+    echo "================================================================"
+    echo "ERROR: Intento de subir archivo sensible bloqueado: $file"
+    echo "Por favor, añade este archivo a tu .gitignore y no lo subas a Git."
+    echo "================================================================"
+    exit 1
+  fi
+
+  # Evitar escanear archivos de documentación (.md) o los propios hooks para evitar falsos positivos
+  if echo "$file" | grep -E -q "\.md$|pre-commit"; then
+    continue
+  fi
+
+  # 2. Escanear el contenido de las líneas añadidas (+) en archivos preparados
+  # Busca patrones comunes de tokens, claves API, contraseñas y credenciales
+  if git diff --cached "$file" | grep -E "^[+][^*]" | grep -E -i -q "ghp_|gho_|github_pat_|AIzaSy|password\s*=|passwd\s*=|client_secret|aws_access_key|client_id|subscription_id"; then
+    echo "================================================================"
+    echo "ERROR: Se ha detectado un posible secreto (token, contraseña o ID de cliente) en: $file"
+    echo "Revisa el contenido antes de subirlo y elimina los datos privados."
+    echo "Líneas conflictivas:"
+    git diff --cached "$file" | grep -E "^[+][^*]" | grep -E -i "ghp_|gho_|github_pat_|AIzaSy|password\s*=|passwd\s*=|client_secret|aws_access_key|client_id|subscription_id"
+    echo "================================================================"
+    exit 1
+  fi
+done
+
+exit 0

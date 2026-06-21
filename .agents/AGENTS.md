@@ -17,3 +17,9 @@ Este archivo contiene las directrices de desarrollo y despliegue del proyecto pa
 - Si los comandos `az` (Azure CLI) o `gh` (GitHub CLI) no se resuelven en la terminal, utilizar sus rutas absolutas predeterminadas en Windows:
   - Azure CLI: `"C:\Program Files\Microsoft SDKs\Azure\CLI2\wbin\az.cmd"`
   - GitHub CLI: `"C:\Program Files\GitHub CLI\gh.exe"`
+
+## 5. Reglas de Seguridad y Prevención de Fugas
+- **Archivos Sensibles**: No subir ni comitear jamás archivos con variables de entorno o credenciales (ej. `.env`, `.env.*`, `secrets.json`, `.pem`, `.key`).
+- **Secretos en Código**: No codificar nunca en duro (*hardcode*) tokens de API (ej. `ghp_`, `gho_`, `AIzaSy`), contraseñas o claves secretas en notebooks ni archivos del proyecto.
+- **Validación con Git Hooks**: El repositorio cuenta con un hook de `pre-commit` en `.githooks/pre-commit` que intercepta automáticamente cualquier intento de commit si detecta archivos sensibles o patrones de secretos en el código modificado. Asegúrate de tenerlo habilitado localmente con el comando: `git config core.hooksPath .githooks`.
+
